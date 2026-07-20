@@ -1,5 +1,6 @@
 #!/bin/zsh
 set -e
+SIGN_IDENTITY="${SIGN_IDENTITY:--}"
 swift build -c release
 APP_DIR="Imouse Clicker.app"
 rm -rf "$APP_DIR"
@@ -16,9 +17,11 @@ cat > "$APP_DIR/Contents/Info.plist" <<'PLIST'
 <key>CFBundleExecutable</key><string>Imouse Clicker</string>
 <key>CFBundleIdentifier</key><string>com.imou.imouse-clicker</string>
 <key>CFBundlePackageType</key><string>APPL</string>
+<key>CFBundleShortVersionString</key><string>1.0.0</string>
+<key>CFBundleVersion</key><string>1</string>
 <key>LSUIElement</key><true/>
 <key>CFBundleIconFile</key><string>AppIcon</string>
 <key>CFBundleIconFiles</key><array><string>AppIcon</string></array>
 </dict></plist>
 PLIST
-codesign --force --deep --sign - "$APP_DIR"
+codesign --force --deep --options runtime --timestamp --sign "$SIGN_IDENTITY" "$APP_DIR"

@@ -2,4 +2,5 @@
 .swiftpm/
 .DS_Store
 Imouse Clicker.app/
+dist/
 *.xcuserstate
