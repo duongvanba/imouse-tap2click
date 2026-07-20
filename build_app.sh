@@ -22,4 +22,3 @@ cat > "$APP_DIR/Contents/Info.plist" <<'PLIST'
 </dict></plist>
 PLIST
 codesign --force --deep --sign - "$APP_DIR"
-open "$APP_DIR"
