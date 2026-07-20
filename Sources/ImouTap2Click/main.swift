@@ -5,8 +5,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
     private let leftItem = NSMenuItem(title: "Tap left mouse to click", action: #selector(toggleLeft), keyEquivalent: "")
     private let rightItem = NSMenuItem(title: "Tap right mouse to context menu", action: #selector(toggleRight), keyEquivalent: "")
+    private let doubleTapItem = NSMenuItem(title: "Double tap to double click", action: #selector(toggleDoubleTap), keyEquivalent: "")
     private var leftEnabled = false { didSet { updateChecks() } }
     private var rightEnabled = false { didSet { updateChecks() } }
+    private var doubleTapEnabled = true { didSet { updateChecks() } }
     private var eventTap: CFMachPort?
     private var lastLeftTapTime: TimeInterval = 0
     private let hidMonitor = HIDMonitor()
@@ -24,6 +26,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         rightItem.target = self
         menu.addItem(leftItem)
         menu.addItem(rightItem)
+        doubleTapItem.target = self
+        menu.addItem(doubleTapItem)
         menu.addItem(.separator())
         let quit = NSMenuItem(title: "Quit", action: #selector(quit), keyEquivalent: "q")
         quit.target = self
@@ -41,9 +45,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         rightItem.state = rightEnabled ? .on : .off
         leftItem.title = "Tap left mouse to click"
         rightItem.title = "Tap right mouse to context menu"
+        doubleTapItem.state = doubleTapEnabled ? .on : .off
+        doubleTapItem.title = "Double tap to double click"
         let check = greenCheckImage()
         leftItem.onStateImage = check
         rightItem.onStateImage = check
+        doubleTapItem.onStateImage = check
     }
 
     private func greenCheckImage() -> NSImage {
@@ -62,6 +69,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         guard requestAccessibilityIfNeeded() else { return }
         rightEnabled.toggle(); updateEventTap()
     }
+    @objc private func toggleDoubleTap() { doubleTapEnabled.toggle() }
 
     private func requestAccessibilityIfNeeded() -> Bool {
         let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
@@ -93,7 +101,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func handleSurfaceTap(isLeft: Bool) {
         guard (isLeft && leftEnabled) || (!isLeft && rightEnabled) else { return }
         let now = ProcessInfo.processInfo.systemUptime
-        let isDoubleLeftTap = isLeft && now - lastLeftTapTime <= 0.45
+        let isDoubleLeftTap = doubleTapEnabled && isLeft && now - lastLeftTapTime <= 0.45
         if isLeft { lastLeftTapTime = now }
         let location = NSEvent.mouseLocation
         let point = CGPoint(x: location.x, y: NSScreen.screens.first!.frame.height - location.y)
