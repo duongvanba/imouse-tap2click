@@ -8,6 +8,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var leftEnabled = false { didSet { updateChecks() } }
     private var rightEnabled = false { didSet { updateChecks() } }
     private var eventTap: CFMachPort?
+    private var lastLeftTapTime: TimeInterval = 0
     private let hidMonitor = HIDMonitor()
     private let multitouchMonitor = MultitouchMonitor()
 
@@ -91,13 +92,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func handleSurfaceTap(isLeft: Bool) {
         guard (isLeft && leftEnabled) || (!isLeft && rightEnabled) else { return }
+        let now = ProcessInfo.processInfo.systemUptime
+        let isDoubleLeftTap = isLeft && now - lastLeftTapTime <= 0.45
+        if isLeft { lastLeftTapTime = now }
         let location = NSEvent.mouseLocation
         let point = CGPoint(x: location.x, y: NSScreen.screens.first!.frame.height - location.y)
         let button: CGMouseButton = isLeft ? .left : .right
         let downType: CGEventType = isLeft ? .leftMouseDown : .rightMouseDown
         let upType: CGEventType = isLeft ? .leftMouseUp : .rightMouseUp
-        CGEvent(mouseEventSource: nil, mouseType: downType, mouseCursorPosition: point, mouseButton: button)?.post(tap: .cghidEventTap)
-        CGEvent(mouseEventSource: nil, mouseType: upType, mouseCursorPosition: point, mouseButton: button)?.post(tap: .cghidEventTap)
+        let down = CGEvent(mouseEventSource: nil, mouseType: downType, mouseCursorPosition: point, mouseButton: button)
+        let up = CGEvent(mouseEventSource: nil, mouseType: upType, mouseCursorPosition: point, mouseButton: button)
+        if isDoubleLeftTap {
+            down?.setIntegerValueField(.mouseEventClickState, value: 2)
+            up?.setIntegerValueField(.mouseEventClickState, value: 2)
+        }
+        down?.post(tap: .cghidEventTap)
+        up?.post(tap: .cghidEventTap)
     }
     @objc private func quit() { NSApp.terminate(nil) }
 }
