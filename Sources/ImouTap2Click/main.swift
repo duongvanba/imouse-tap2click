@@ -121,6 +121,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 }
 
 let app = NSApplication.shared
+if let bundleIdentifier = Bundle.main.bundleIdentifier,
+   NSRunningApplication.runningApplications(withBundleIdentifier: bundleIdentifier).contains(where: { $0.processIdentifier != ProcessInfo.processInfo.processIdentifier }) {
+    exit(0)
+}
 let delegate = AppDelegate()
 app.delegate = delegate
 app.run()
