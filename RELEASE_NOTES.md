@@ -11,4 +11,4 @@ First public release of Imouse Clicker for Apple silicon Macs.
 - Accessibility permission handling
 - Single-instance protection
 
-The app is signed with **Developer ID Application: Ba DUong** (Team ID `3LMA9TXC7Z`). It is not notarized yet.
+The app is signed with **Developer ID Application: Ba DUong** (Team ID `3LMA9TXC7Z`) and notarized by Apple.
