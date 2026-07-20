@@ -17,8 +17,8 @@ cat > "$APP_DIR/Contents/Info.plist" <<'PLIST'
 <key>CFBundleIdentifier</key><string>com.imou.imouse-clicker</string>
 <key>CFBundlePackageType</key><string>APPL</string>
 <key>LSUIElement</key><true/>
-<key>CFBundleIconFile</key><string>AppIcon.icns</string>
-<key>CFBundleIconName</key><string>AppIcon</string>
+<key>CFBundleIconFile</key><string>AppIcon</string>
+<key>CFBundleIconFiles</key><array><string>AppIcon</string></array>
 </dict></plist>
 PLIST
 codesign --force --deep --sign - "$APP_DIR"
